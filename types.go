@@ -1,4 +1,4 @@
-package convenientstructures
+package ezs
 
 type Number interface {
 	uint | uint8 | uint16 | uint32 | uint64 |
@@ -10,7 +10,7 @@ type Serializable interface {
 	string | bool | Number
 }
 
-type Iterator[T any] interface {
-	Next() (T, bool)
-	Done() bool
+type Iterable[T any] interface {
+	Next() (value T, done bool)
+	IterReset()
 }

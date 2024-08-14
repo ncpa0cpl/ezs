@@ -1,9 +1,9 @@
-package convenientstructures_test
+package ezs_test
 
 import (
 	"testing"
 
-	. "github.com/ncpa0cpl/convenient-structures"
+	. "github.com/ncpa0cpl/ezs"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,9 +14,7 @@ func TestArrayIterator(t *testing.T) {
 
 	iteratedOver := make([]int, 0)
 
-	iterator := arr.Iterator()
-	for !iterator.Done() {
-		v, _ := iterator.Next()
+	for v := range arr.Iter() {
 		iteratedOver = append(iteratedOver, v)
 	}
 
@@ -35,20 +33,128 @@ func TestMapIterator(t *testing.T) {
 		"three": 3,
 	})
 
-	iteratedOver := make([]MapEntry[string, int], 0)
+	iteratedOver := make([]*MapEntry[string, int], 0)
 
-	iterator := m.Iterator()
-	for !iterator.Done() {
-		v, _ := iterator.Next()
-		iteratedOver = append(iteratedOver, v)
+	for entry := range m.Iter() {
+		iteratedOver = append(iteratedOver, entry)
+	}
+
+	assert.Contains(
+		iteratedOver,
+		&MapEntry[string, int]{"one", 1},
+	)
+	assert.Contains(
+		iteratedOver,
+		&MapEntry[string, int]{"two", 2},
+	)
+	assert.Contains(
+		iteratedOver,
+		&MapEntry[string, int]{"three", 3},
+	)
+}
+
+func TestIteratorBreak(t *testing.T) {
+	assert := assert.New(t)
+
+	arr := NewArray([]string{})
+
+	arr.Push("foo")
+	arr.Push("bar")
+	arr.Push("baz")
+	arr.Push("qux")
+
+	acc := ""
+
+	for v := range arr.Iter() {
+		acc = acc + v
+		if v == "bar" {
+			break
+		}
 	}
 
 	assert.Equal(
-		[]MapEntry[string, int]{
-			{"one", 1},
-			{"two", 2},
-			{"three", 3},
-		},
-		iteratedOver,
+		"foobar",
+		acc,
+	)
+}
+
+func TestIterateMultipleTimesOverTheSameIterator(t *testing.T) {
+	assert := assert.New(t)
+
+	arr := NewArray([]string{})
+
+	arr.Push("foo")
+	arr.Push("bar")
+	arr.Push("baz")
+	iterator := arr.Iter()
+
+	acc := ""
+	iterCount := 0
+
+	for v := range iterator {
+		iterCount++
+		acc = acc + v
+	}
+
+	assert.Equal(
+		3,
+		iterCount,
+	)
+
+	for v := range iterator {
+		iterCount++
+		acc = acc + v
+	}
+
+	assert.Equal(
+		6,
+		iterCount,
+	)
+
+	assert.Equal(
+		"foobarbazfoobarbaz",
+		acc,
+	)
+}
+
+func TestIterateMultipleTimesOverTheSameIteratorAfterBreaking(t *testing.T) {
+	assert := assert.New(t)
+
+	arr := NewArray([]string{})
+
+	arr.Push("foo")
+	arr.Push("bar")
+	arr.Push("baz")
+	iterator := arr.Iter()
+
+	acc := ""
+	iterCount := 0
+
+	for v := range iterator {
+		iterCount++
+		acc = acc + v
+		if v == "foo" {
+			break
+		}
+	}
+
+	assert.Equal(
+		1,
+		iterCount,
+	)
+
+	for v := range iterator {
+		iterCount++
+		acc = acc + v
+	}
+
+	assert.Equal(
+		4,
+		iterCount,
+	)
+
+	assert.Equal(
+		"foofoobarbaz",
+		acc,
 	)
 }

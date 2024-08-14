@@ -1,10 +1,10 @@
-package convenientstructures_test
+package ezs_test
 
 import (
 	"strconv"
 	"testing"
 
-	. "github.com/ncpa0cpl/convenient-structures"
+	. "github.com/ncpa0cpl/ezs"
 	"github.com/stretchr/testify/assert"
 )
 

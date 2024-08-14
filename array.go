@@ -1,4 +1,4 @@
-package convenientstructures
+package ezs
 
 import (
 	"cmp"
@@ -7,11 +7,17 @@ import (
 )
 
 type Array[T any] struct {
-	data []T
+	data    []T
+	iterIdx int
+}
+
+type ArrayEntry[T any] struct {
+	Index int
+	Value T
 }
 
 func NewArray[T any](data []T) *Array[T] {
-	return &Array[T]{data}
+	return &Array[T]{data: data, iterIdx: 0}
 }
 
 // Adds new elements to the end of the array
@@ -164,10 +170,6 @@ func (a *Array[T]) ForEach(callback func(T, int)) {
 	}
 }
 
-func (a *Array[T]) Iterator() Iterator[T] {
-	return NewArrayIterator[T](a)
-}
-
 // Creates a shallow copy of the array
 func (a *Array[T]) Copy() *Array[T] {
 	arr := make([]T, len(a.data))
@@ -190,6 +192,34 @@ func (a *Array[T]) SortWithReverse(compare func(T, T) int) {
 	slices.SortFunc[[]T, T](a.data, func(a, b T) int {
 		return compare(b, a)
 	})
+}
+
+func (a *Array[T]) Entries() []*ArrayEntry[T] {
+	entries := []*ArrayEntry[T]{}
+	for idx, v := range a.data {
+		entry := &ArrayEntry[T]{idx, v}
+		entries = append(entries, entry)
+	}
+	return entries
+}
+
+func (a *Array[T]) Next() (T, bool) {
+	len := len(a.data)
+	if a.iterIdx < len {
+		retVal := a.data[a.iterIdx]
+		a.iterIdx++
+		return retVal, false
+	}
+	var zero T
+	return zero, true
+}
+
+func (a *Array[T]) IterReset() {
+	a.iterIdx = 0
+}
+
+func (a *Array[T]) Iter() func(func(T) bool) {
+	return Iterator(a)
 }
 
 // Sorts the array in place using the provided function to get the

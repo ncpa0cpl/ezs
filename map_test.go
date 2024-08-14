@@ -1,11 +1,11 @@
-package convenientstructures_test
+package ezs_test
 
 import (
 	"cmp"
 	"slices"
 	"testing"
 
-	. "github.com/ncpa0cpl/convenient-structures"
+	. "github.com/ncpa0cpl/ezs"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -190,16 +190,16 @@ func TestMapEntries(t *testing.T) {
 		entries.Length(),
 	)
 
-	assert.True(entries.Some(func(entry MapEntry[string, int], _ int) bool {
+	assert.True(entries.Some(func(entry *MapEntry[string, int], _ int) bool {
 		return entry.Key == "one" && entry.Value == 1
 	}))
-	assert.True(entries.Some(func(entry MapEntry[string, int], _ int) bool {
+	assert.True(entries.Some(func(entry *MapEntry[string, int], _ int) bool {
 		return entry.Key == "two" && entry.Value == 2
 	}))
-	assert.True(entries.Some(func(entry MapEntry[string, int], _ int) bool {
+	assert.True(entries.Some(func(entry *MapEntry[string, int], _ int) bool {
 		return entry.Key == "three" && entry.Value == 3
 	}))
-	assert.False(entries.Some(func(entry MapEntry[string, int], _ int) bool {
+	assert.False(entries.Some(func(entry *MapEntry[string, int], _ int) bool {
 		return entry.Key == "four"
 	}))
 }
