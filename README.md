@@ -9,7 +9,7 @@ Arrays and Maps that are easier to use.
 package main
 
 import (
-		. "github.com/ncpa0cpl/ezs"
+	. "github.com/ncpa0cpl/ezs"
 )
 
 func main() {
@@ -20,7 +20,7 @@ func main() {
 	myArray.Push("")
 	myArray.Push("World")
 
-	myArray = myArray.Filter(func(value string) bool {
+	myArray = myArray.Filter(func(value string, idx int) bool {
 		return value != ""
 	})
 
@@ -35,7 +35,7 @@ func main() {
 package main
 
 import (
-		. "github.com/ncpa0cpl/ezs"
+	. "github.com/ncpa0cpl/ezs"
 )
 
 func main() {
@@ -43,7 +43,6 @@ func main() {
 
 	myMap.Set("foo", "1")
 	myMap.Set("bar", "2")
-
 
 	fmt.Println(myMap.Has("foo")) // true
 
@@ -62,7 +61,7 @@ func main() {
 package main
 
 import (
-		. "github.com/ncpa0cpl/ezs"
+	. "github.com/ncpa0cpl/ezs"
 )
 
 func main() {
@@ -94,10 +93,10 @@ Any struct implementing the above interface can be used as Iterators, and be ite
 package main
 
 import (
-		. "github.com/ncpa0cpl/ezs"
+	. "github.com/ncpa0cpl/ezs"
 )
 
-type MyIterableStruct {
+type MyIterableStruct struct {
 	value1       string
 	value2       string
 	value3       string
