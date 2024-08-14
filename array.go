@@ -64,8 +64,8 @@ func (a *Array[T]) Set(idx int, data T) *Array[T] {
 
 // Inserts new elements at the specified index, shifting the
 // elements after the index
-func (a *Array[T]) Insert(after int, data ...T) *Array[T] {
-	a.data = append(a.data[:after+1], append(data, a.data[after+1:]...)...)
+func (a *Array[T]) Insert(at int, data ...T) *Array[T] {
+	a.data = append(a.data[:at], append(data, a.data[at:]...)...)
 	return a
 }
 
@@ -79,19 +79,19 @@ func (a *Array[T]) Slice(start, end int) *Array[T] {
 	return NewArray[T](a.data[start:end])
 }
 
-// Removes elements from an array from the given index range
+// Removes {count} elements from an array starting from the given index
 // and returns the removed elements
-func (a *Array[T]) Splice(start, end int) *Array[T] {
-	s := slices.Clone(a.data[start:end])
-	a.data = append(a.data[:start], a.data[end:]...)
+func (a *Array[T]) Splice(start, count int) *Array[T] {
+	s := slices.Clone(a.data[start : start+count])
+	a.data = append(a.data[:start], a.data[start+count:]...)
 	return NewArray[T](s)
 }
 
-// Removes elements from an array from the given index range,
+// Removes {count} elements from an array starting from the given index,
 // inserts new elements in their place and returns the removed elements
-func (a *Array[T]) Replace(start, end int, data ...T) *Array[T] {
-	s := slices.Clone(a.data[start:end])
-	a.data = append(a.data[:start], append(data, a.data[end:]...)...)
+func (a *Array[T]) Replace(start, count int, data ...T) *Array[T] {
+	s := slices.Clone(a.data[start : start+count])
+	a.data = append(a.data[:start], append(data, a.data[start+count:]...)...)
 	return NewArray[T](s)
 }
 

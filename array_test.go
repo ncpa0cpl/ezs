@@ -94,13 +94,13 @@ func TestArrayInsert(t *testing.T) {
 
 	arr.Insert(0, 10)
 	assert.Equal(
-		[]int{1, 10, 2, 3, 4, 5},
+		[]int{10, 1, 2, 3, 4, 5},
 		arr.ToSlice(),
 	)
 
-	arr.Insert(2, 20, 30).Insert(3, 11, 22, 33)
+	arr.Insert(1, 20, 30).Insert(2, 11, 22, 33)
 	assert.Equal(
-		[]int{1, 10, 2, 20, 11, 22, 33, 30, 3, 4, 5},
+		[]int{10, 20, 11, 22, 33, 30, 1, 2, 3, 4, 5},
 		arr.ToSlice(),
 	)
 }
@@ -139,7 +139,7 @@ func TestArraySplice(t *testing.T) {
 
 	assert.Equal(
 		[]int{4, 5, 6},
-		arr.Splice(3, 6).ToSlice(),
+		arr.Splice(3, 3).ToSlice(),
 	)
 	assert.Equal(
 		[]int{1, 2, 3, 7, 8},
@@ -153,11 +153,11 @@ func TestArrayReplace(t *testing.T) {
 	arr := NewArray[int]([]int{1, 2, 3, 4, 5, 6, 7, 8})
 
 	assert.Equal(
-		[]int{4, 5, 6},
-		arr.Replace(3, 6, 0).ToSlice(),
+		[]int{3, 4},
+		arr.Replace(2, 2, 0).ToSlice(),
 	)
 	assert.Equal(
-		[]int{1, 2, 3, 0, 7, 8},
+		[]int{1, 2, 0, 5, 6, 7, 8},
 		arr.ToSlice(),
 	)
 }
