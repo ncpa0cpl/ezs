@@ -52,14 +52,14 @@ func (m *Map[K, V]) Get(key K) (V, bool) {
 }
 
 func (m *Map[K, V]) Set(key K, value V) *Map[K, V] {
-	m.inner[key] = value
 	m.addkey(key)
+	m.inner[key] = value
 	return m
 }
 
 func (m *Map[K, V]) Delete(key K) *Map[K, V] {
-	delete(m.inner, key)
 	m.removekey(key)
+	delete(m.inner, key)
 	return m
 }
 
