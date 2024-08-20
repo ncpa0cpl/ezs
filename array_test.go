@@ -220,6 +220,23 @@ func TestArrayFilter(t *testing.T) {
 		}).ToSlice(),
 	)
 	assert.Equal(
+		[]int{1, 2, 3, 4, 5},
+		arr.ToSlice(),
+	)
+}
+
+func TestArrayRemove(t *testing.T) {
+	assert := assert.New(t)
+
+	arr := NewArray[int]([]int{1, 2, 3, 4, 5})
+
+	assert.Equal(
+		[]int{2, 4},
+		arr.Remove(func(v, _ int) bool {
+			return v%2 == 1
+		}).ToSlice(),
+	)
+	assert.Equal(
 		[]int{2, 4},
 		arr.ToSlice(),
 	)

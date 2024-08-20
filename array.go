@@ -109,6 +109,19 @@ func (a *Array[T]) Reverse() *Array[T] {
 
 // Removes elements from the array that do not satisfy the
 // predicate
+func (a *Array[T]) Remove(predicate func(T, int) bool) *Array[T] {
+	var arr []T
+	for idx, v := range a.data {
+		if !predicate(v, idx) {
+			arr = append(arr, v)
+		}
+	}
+	a.data = arr
+	return a
+}
+
+// Create a new array containing all the elements from the source array
+// that satisfy the given predicate
 func (a *Array[T]) Filter(predicate func(T, int) bool) *Array[T] {
 	var arr []T
 	for idx, v := range a.data {
@@ -116,8 +129,7 @@ func (a *Array[T]) Filter(predicate func(T, int) bool) *Array[T] {
 			arr = append(arr, v)
 		}
 	}
-	a.data = arr
-	return a
+	return NewArray(arr)
 }
 
 // Returns the first element in the array that satisfies the
