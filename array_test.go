@@ -75,6 +75,41 @@ func TestArrayAt(t *testing.T) {
 	assert.Equal(1, arr.At(-5))
 }
 
+func TestArrayAtPtr(t *testing.T) {
+	assert := assert.New(t)
+
+	type Elem struct {
+		value string
+	}
+
+	arr := NewArray[Elem]([]Elem{
+		Elem{
+			value: "first",
+		},
+		Elem{
+			value: "second",
+		},
+		Elem{
+			value: "third",
+		},
+	})
+
+	assert.Equal("first", arr.AtPtr(0).value)
+	assert.Equal("second", arr.AtPtr(1).value)
+	assert.Equal("third", arr.AtPtr(2).value)
+
+	assert.Equal("first", arr.AtPtr(-3).value)
+	assert.Equal("second", arr.AtPtr(-2).value)
+	assert.Equal("third", arr.AtPtr(-1).value)
+
+	// changing the value is refelcted in the original array
+	sec := arr.AtPtr(1)
+	sec.value = "ABC"
+
+	assert.Equal("ABC", arr.At(1).value)
+	assert.Equal("ABC", arr.At(-2).value)
+}
+
 func TestArraySet(t *testing.T) {
 	assert := assert.New(t)
 
@@ -475,16 +510,86 @@ func TestArrayJoin(t *testing.T) {
 	assert := assert.New(t)
 
 	arr := NewArray[string]([]string{"foo", "bar", "baz", "qux", "quux"})
-
 	assert.Equal(
 		"foo,bar,baz,qux,quux",
 		Join(arr, ","),
 	)
 
-	arr2 := NewArray[int]([]int{1, 2, 3, 4, 5})
-
+	arr2 := NewArray[int]([]int{1, 2, 3, -5, 4, 5, -100})
 	assert.Equal(
-		"1,2,3,4,5",
+		"1,2,3,-5,4,5,-100",
 		Join(arr2, ","),
+	)
+
+	arr3 := NewArray[bool]([]bool{true, true, false, true})
+	assert.Equal(
+		"true,true,false,true",
+		Join(arr3, ","),
+	)
+
+	arr4 := NewArray[uint]([]uint{10, 20, 30})
+	assert.Equal(
+		"10,20,30",
+		Join(arr4, ","),
+	)
+
+	arr5 := NewArray[uint8]([]uint8{100, 99})
+	assert.Equal(
+		"100,99",
+		Join(arr5, ","),
+	)
+
+	arr6 := NewArray[uint16]([]uint16{69, 420, 69})
+	assert.Equal(
+		"69,420,69",
+		Join(arr6, ","),
+	)
+
+	arr7 := NewArray[uint32]([]uint32{1000, 10000, 1000000})
+	assert.Equal(
+		"1000,10000,1000000",
+		Join(arr7, ","),
+	)
+
+	arr8 := NewArray[uint64]([]uint64{22, 222, 2222, 222, 22})
+	assert.Equal(
+		"22,222,2222,222,22",
+		Join(arr8, ","),
+	)
+
+	arr9 := NewArray[int8]([]int8{0, -1, 1, -2, 2})
+	assert.Equal(
+		"0,-1,1,-2,2",
+		Join(arr9, ","),
+	)
+
+	arr10 := NewArray[int16]([]int16{-1, -11, -111, -1111, -11111})
+	assert.Equal(
+		"-1,-11,-111,-1111,-11111",
+		Join(arr10, ","),
+	)
+
+	arr11 := NewArray[int32]([]int32{-99, 99, 500, -500, 1000000, -1000000})
+	assert.Equal(
+		"-99,99,500,-500,1000000,-1000000",
+		Join(arr11, ","),
+	)
+
+	arr12 := NewArray[int64]([]int64{-999999999999999999, 999999999999999999, 0, 1234})
+	assert.Equal(
+		"-999999999999999999,999999999999999999,0,1234",
+		Join(arr12, ","),
+	)
+
+	arr13 := NewArray[float32]([]float32{0.12345568, 12344567, 69.420})
+	assert.Equal(
+		"0.12345568,12344567,69.42",
+		Join(arr13, ","),
+	)
+
+	arr14 := NewArray[float64]([]float64{0, 6.9, 98765.56789, -654321.12345, -4.20, -0})
+	assert.Equal(
+		"0,6.9,98765.56789,-654321.12345,-4.2,0",
+		Join(arr14, ","),
 	)
 }

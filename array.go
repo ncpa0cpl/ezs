@@ -56,6 +56,15 @@ func (a *Array[T]) At(idx int) T {
 	return a.data[idx]
 }
 
+// Returns a pointer to the element at the specified index
+func (a *Array[T]) AtPtr(idx int) *T {
+	if idx < 0 {
+		idx = len(a.data) + idx
+	}
+
+	return &a.data[idx]
+}
+
 // Changes the value at the specified index
 func (a *Array[T]) Set(idx int, data T) *Array[T] {
 	a.data[idx] = data
@@ -132,6 +141,20 @@ func (a *Array[T]) Filter(predicate func(T, int) bool) *Array[T] {
 	return NewArray(arr)
 }
 
+// Removes elements from the array that do not satisfy the
+// predicate
+func (a *Array[T]) FilterPtr(predicate func(*T, int) bool) *Array[T] {
+	var arr []T
+	for idx, _ := range a.data {
+		v := &a.data[idx]
+		if predicate(v, idx) {
+			arr = append(arr, a.data[idx])
+		}
+	}
+	a.data = arr
+	return a
+}
+
 // Returns the first element in the array that satisfies the
 // predicate
 func (a *Array[T]) Find(predicate func(T, int) bool) (bool, T) {
@@ -144,10 +167,34 @@ func (a *Array[T]) Find(predicate func(T, int) bool) (bool, T) {
 	return false, zero
 }
 
+// Returns the first element in the array that satisfies the
+// predicate as a pointer
+func (a *Array[T]) FindPtr(predicate func(*T, int) bool) (bool, *T) {
+	for idx, _ := range a.data {
+		v := &a.data[idx]
+		if predicate(v, idx) {
+			return true, v
+		}
+	}
+	return false, nil
+}
+
 // Returns the index of the first element in the array that
 // satisfies the predicate
 func (a *Array[T]) FindIndex(predicate func(T, int) bool) int {
 	for idx, v := range a.data {
+		if predicate(v, idx) {
+			return idx
+		}
+	}
+	return -1
+}
+
+// Returns the index of the first element in the array that
+// satisfies the predicate
+func (a *Array[T]) FindIndexPtr(predicate func(*T, int) bool) int {
+	for idx, _ := range a.data {
+		v := &a.data[idx]
 		if predicate(v, idx) {
 			return idx
 		}
@@ -166,6 +213,18 @@ func (a *Array[T]) Some(predicate func(T, int) bool) bool {
 	return false
 }
 
+// Returns true if at least one element in the array satisfies
+// the predicate
+func (a *Array[T]) SomePtr(predicate func(*T, int) bool) bool {
+	for idx, _ := range a.data {
+		v := &a.data[idx]
+		if predicate(v, idx) {
+			return true
+		}
+	}
+	return false
+}
+
 // Returns true if all elements in the array satisfy the predicate
 func (a *Array[T]) Every(predicate func(T, int) bool) bool {
 	for idx, v := range a.data {
@@ -176,8 +235,26 @@ func (a *Array[T]) Every(predicate func(T, int) bool) bool {
 	return true
 }
 
+// Returns true if all elements in the array satisfy the predicate
+func (a *Array[T]) EveryPtr(predicate func(*T, int) bool) bool {
+	for idx, _ := range a.data {
+		v := &a.data[idx]
+		if !predicate(v, idx) {
+			return false
+		}
+	}
+	return true
+}
+
 func (a *Array[T]) ForEach(callback func(T, int)) {
 	for idx, v := range a.data {
+		callback(v, idx)
+	}
+}
+
+func (a *Array[T]) ForEachPtr(callback func(*T, int)) {
+	for idx, _ := range a.data {
+		v := &a.data[idx]
 		callback(v, idx)
 	}
 }
@@ -309,40 +386,64 @@ func Compare[T cmp.Ordered](a, b *Array[T]) int {
 // given separator
 func Join[T Serializable](array *Array[T], sep string) string {
 	str := ""
-	for idx, v := range array.data {
-		if idx > 0 {
-			str += sep
+	switch slice := any(array.data).(type) {
+	case []string:
+		for _, v := range slice {
+			str += sep + v
 		}
-		switch x := any(v).(type) {
-		case string:
-			str += x
-		case bool:
-			str += strconv.FormatBool(x)
-		case uint:
-			str += strconv.FormatUint(uint64(x), 10)
-		case uint8:
-			str += strconv.FormatUint(uint64(x), 10)
-		case uint16:
-			str += strconv.FormatUint(uint64(x), 10)
-		case uint32:
-			str += strconv.FormatUint(uint64(x), 10)
-		case uint64:
-			str += strconv.FormatUint(x, 10)
-		case int:
-			str += strconv.FormatInt(int64(x), 10)
-		case int8:
-			str += strconv.FormatInt(int64(x), 10)
-		case int16:
-			str += strconv.FormatInt(int64(x), 10)
-		case int32:
-			str += strconv.FormatInt(int64(x), 10)
-		case int64:
-			str += strconv.FormatInt(x, 10)
-		case float32:
-			str += strconv.FormatFloat(float64(x), 'f', -1, 32)
-		case float64:
-			str += strconv.FormatFloat(x, 'f', -1, 64)
+	case []bool:
+		for _, v := range slice {
+			str += sep + strconv.FormatBool(v)
+		}
+	case []uint:
+		for _, v := range slice {
+			str += sep + strconv.FormatUint(uint64(v), 10)
+		}
+	case []uint8:
+		for _, v := range slice {
+			str += sep + strconv.FormatUint(uint64(v), 10)
+		}
+	case []uint16:
+		for _, v := range slice {
+			str += sep + strconv.FormatUint(uint64(v), 10)
+		}
+	case []uint32:
+		for _, v := range slice {
+			str += sep + strconv.FormatUint(uint64(v), 10)
+		}
+	case []uint64:
+		for _, v := range slice {
+			str += sep + strconv.FormatUint(v, 10)
+		}
+	case []int:
+		for _, v := range slice {
+			str += sep + strconv.FormatInt(int64(v), 10)
+		}
+	case []int8:
+		for _, v := range slice {
+			str += sep + strconv.FormatInt(int64(v), 10)
+		}
+	case []int16:
+		for _, v := range slice {
+			str += sep + strconv.FormatInt(int64(v), 10)
+		}
+	case []int32:
+		for _, v := range slice {
+			str += sep + strconv.FormatInt(int64(v), 10)
+		}
+	case []int64:
+		for _, v := range slice {
+			str += sep + strconv.FormatInt(v, 10)
+		}
+	case []float32:
+		for _, v := range slice {
+			str += sep + strconv.FormatFloat(float64(v), 'f', -1, 32)
+		}
+	case []float64:
+		for _, v := range slice {
+			str += sep + strconv.FormatFloat(v, 'f', -1, 64)
 		}
 	}
-	return str
+
+	return str[len(sep):]
 }
